@@ -7,7 +7,7 @@
 
 curl -O https://raw.githubusercontent.com/daedrafruit/arch-test/main/vars-config.bash
 chmod +x vars-config.bash
-cp vars-config.bash /mtn/root/vars-config.bash
+
 source ./vars-config.bash
 
 # Select the target disk for installation
@@ -75,6 +75,8 @@ cat > /mnt/etc/hosts <<EOF
 ::1         localhost
 127.0.1.1   $hostname.localdomain   $hostname
 EOF
+
+cp vars-config.bash /mtn/root/vars-config.bash
 
 # Run system configuration script inside chroot
 curl -O https://raw.githubusercontent.com/daedrafruit/arch-test/main/system-config.bash
