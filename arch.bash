@@ -9,6 +9,9 @@ rootpass="password"
 username="daedr"
 userpass="password"
 
+locale="en_US.UTF-8"
+kblayout="us"
+
 echo "Available disks for installation:"
 select ENTRY in $(lsblk -dpnoNAME | grep -P "/dev/sd|nvme|vd"); do
     DISK="$ENTRY"
@@ -42,8 +45,8 @@ ROOT="/dev/disk/by-partlabel/ROOT"
 partprobe "$DISK"
 
 # Format the partitions
-mkfs.fat -F 32 "$ESP" &>/dev/null
-mkfs.ext4 "$ROOT" &>/dev/null
+mkfs.fat -F 32 "$ESP"
+mkfs.ext4 "$ROOT"
 
 # Mount the root and EFI partitions
 mount "$ROOT" /mnt
@@ -51,22 +54,22 @@ mkdir -p /mnt/boot
 mount "$ESP" /mnt/boot
 
 # Install the base system
-pacstrap /mnt base base-devel linux linux-firmware sudo networkmanager grub
+pacstrap /mnt base base-devel linux linux-firmware sudo networkmanager grub efibootmgr
 
 # Generate fstab
 genfstab -U /mnt >> /mnt/etc/fstab
 
 #enable networkmanager
-systemctl enable NetworkManager --root=/mnt &>/dev/null
+systemctl enable NetworkManager --root=/mnt
 
 # Set hostname, locale, and keyboard layout
 echo "$hostname" > /mnt/etc/hostname
 
-locale="en_US.UTF-8"
+
 echo "LANG=$locale" > /mnt/etc/locale.conf
 echo "$locale UTF-8" > /mnt/etc/locale.gen
 
-kblayout="us"
+
 echo "KEYMAP=$kblayout" > /mnt/etc/vconsole.conf
 
 # Configuring the system.
@@ -79,16 +82,16 @@ arch-chroot /mnt /bin/bash -x -e <<EOF
     hwclock --systohc
 
     # Generating locales.
-    locale-gen &>/dev/null
+    locale-gen
 
     # Generating a new initramfs.
-    mkinitcpio -P &>/dev/null
+    mkinitcpio -P
 
     # Installing GRUB.
-    grub-install --target=x86_64-efi --efi-directory=/boot/ --bootloader-id=GRUB &>/dev/null
+    grub-install --target=x86_64-efi --efi-directory=/boot --bootloader-id=GRUB
 
     # Creating grub config file.
-    grub-mkconfig -o /boot/grub/grub.cfg &>/dev/null
+    grub-mkconfig -o /boot/grub/grub.cfg
 
 EOF
 
