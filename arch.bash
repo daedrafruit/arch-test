@@ -1,4 +1,4 @@
-#!/usr/bin/env -S bash -e
+#!/usr/bin/env -S bash -e -x
 
 # Clear the terminal
 clear
@@ -27,11 +27,11 @@ parted -s "$DISK" \
     mklabel gpt \
     mkpart ESP fat32 1MiB 1025MiB \
     set 1 esp on \
-    mkpart primary ext4 1025MiB 100%
+    mkpart root ext4 1025MiB 100%
 
 # Assign partitions to variables
-ESP=$(lsblk -rno NAME | grep -P "^$(basename "$DISK")p1$")
-ROOT=$(lsblk -rno NAME | grep -P "^$(basename "$DISK")p2$")
+ESP="/dev/disk/by-partlabel/ESP"
+ROOT="/dev/disk/by-partlabel/root"
 
 # Inform the Kernel of the partition changes
 partprobe "$DISK"
