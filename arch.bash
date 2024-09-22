@@ -1,5 +1,7 @@
 #!/usr/bin/env -S bash -e -x
 
+# curl -O https://raw.githubusercontent.com/daedrafruit/arch-test/main/arch.bash
+
 # Clear the terminal
 clear
 
@@ -37,13 +39,14 @@ ROOT="/dev/disk/by-partlabel/root"
 partprobe "$DISK"
 
 # Format the partitions
-mkfs.fat -F 32 "/dev/$ESP"
-mkfs.ext4 "/dev/$ROOT"
+mkfs.fat -F 32 "$ESP"
+mkfs.ext4 "$ROOT"
+
 
 # Mount the root and EFI partitions
-mount "/dev/$ROOT" /mnt
+mount "$ROOT" /mnt
 mkdir -p /mnt/boot
-mount "/dev/$ESP" /mnt/boot
+mount "$ESP" /mnt/boot
 
 # Install the base system
 pacstrap /mnt base base-devel linux linux-headers linux-firmware sudo networkmanager
