@@ -79,6 +79,14 @@ cat > /mnt/etc/hosts <<EOF
 127.0.1.1   $hostname.localdomain   $hostname
 EOF
 
+# Set root password
+echo "root:$rootpass" | arch-chroot /mnt chpasswd
+
+# Add a user with sudo privileges
+echo "%wheel ALL=(ALL:ALL) ALL" > /mnt/etc/sudoers.d/wheel
+arch-chroot /mnt useradd -m -G wheel -s /bin/bash "$username"
+echo "$username:$userpass" | arch-chroot /mnt chpasswd
+
 # Configure the system
 arch-chroot /mnt /bin/bash -x -e <<EOF
 
@@ -101,7 +109,7 @@ arch-chroot /mnt /bin/bash -x -e <<EOF
     grub-mkconfig -o /boot/grub/grub.cfg
 	
 	# Additional Packages
-	pacman -S --noconfirm git firefox sway waybar ranger wofi kitty flameshot ly
+	pacman -S --noconfirm git stow firefox sway waybar ranger wofi kitty flameshot ly
 	
 	# Clone dotfiles
 	git clone https://github.com/daedrafruit/dotfiles.git /home/$username
@@ -110,14 +118,6 @@ arch-chroot /mnt /bin/bash -x -e <<EOF
 	
 	
 EOF
-
-# Set root password
-echo "root:$rootpass" | arch-chroot /mnt chpasswd
-
-# Add a user with sudo privileges
-echo "%wheel ALL=(ALL:ALL) ALL" > /mnt/etc/sudoers.d/wheel
-arch-chroot /mnt useradd -m -G wheel -s /bin/bash "$username"
-echo "$username:$userpass" | arch-chroot /mnt chpasswd
 
 # Finish up
 echo "Installation complete. You can now reboot."
