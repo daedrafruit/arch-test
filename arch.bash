@@ -1,6 +1,9 @@
 #!/usr/bin/env -S bash -e -x
 
+# Usage:
 # curl -O https://raw.githubusercontent.com/daedrafruit/arch-test/main/arch.bash
+# chmod +x arch.bash
+# ./arch.bash
 
 hostname="fruit"
 rootpass="password"
@@ -76,17 +79,16 @@ cat > /mnt/etc/hosts <<EOF
 127.0.1.1   $hostname.localdomain   $hostname
 EOF
 
-# Set root password
-echo "root:$rootpass" | arch-chroot /mnt chpasswd
-
-# Add a user with sudo privileges
-echo "%wheel ALL=(ALL:ALL) ALL" > /mnt/etc/sudoers.d/wheel
-arch-chroot /mnt useradd -m -G wheel -s /bin/bash "$username"
-echo "$username:$userpass" | arch-chroot /mnt chpasswd
-
 # Configure the system
 arch-chroot /mnt /bin/bash -x -e <<EOF
 
+    # Set root password
+    echo "root:$rootpass" | chpasswd
+
+    # Add user and set password
+    useradd -m -G wheel -s /bin/bash "$username"
+    echo "$username:$userpass" | chpasswd
+	
 	# Setting up timezone.
 	ln -sf /usr/share/zoneinfo/US/Arizona /etc/localtime
 
@@ -106,33 +108,35 @@ arch-chroot /mnt /bin/bash -x -e <<EOF
 	grub-mkconfig -o /boot/grub/grub.cfg
 
 	# Additional Packages
-	pacman -S --noconfirm --needed git stow firefox waybar ranger wofi kitty flameshot ly
+	# consider nvidia mesa amd-ucode
+	pacman -S --noconfirm --needed git base-devel stow firefox waybar ranger wofi kitty flameshot ly
 
 	#enable services
 	systemctl enable NetworkManager systemd-timesyncd ly
-
-	# Configure as user
-	sudo -u $username bash <<EOC
-		cd /home/$username
-
-		# install yay
-		git clone https://aur.archlinux.org/yay.git
-		cd yay
-		makepkg -si --noconfirm
-		cd /home/$username
-
-		# Install packages using yay
-		yay -S --noconfirm swayfx sway-nvidia
-				
-		# Clone dotfiles
-		git clone https://github.com/daedrafruit/dotfiles.git
-		# remove existing bashrc
-		rm /home/$username/.bashrc
-		# stow dotfiles
-		cd /home/$username/dotfiles
-		stow sway waybar wofi kitty flameshot bashrc ranger
-	EOC
+	
 EOF
+
+# Configure as user
+arch-chroot /mnt /usr/bin/runuser -u $username -c '
+	cd /home/$username
+
+	# install yay
+	git clone https://aur.archlinux.org/yay.git
+	cd yay
+	makepkg -si --noconfirm
+	cd /home/$username
+
+	# Install packages using yay
+	yay -S --noconfirm swayfx sway-nvidia
+			
+	# Clone dotfiles
+	git clone https://github.com/daedrafruit/dotfiles.git
+	# remove existing bashrc
+	rm /home/$username/.bashrc
+	# stow dotfiles
+	cd /home/$username/dotfiles
+	stow sway waybar wofi kitty flameshot bashrc ranger
+'
 	
 # Finish up
 echo "Installation complete. You can now reboot."
