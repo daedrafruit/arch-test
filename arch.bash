@@ -76,7 +76,7 @@ cat > /mnt/etc/hosts <<EOF
 127.0.1.1   $hostname.localdomain   $hostname
 EOF
 
-cp vars-config.bash /mtn/root/vars-config.bash
+cp vars-config.bash /mnt/root/vars-config.bash
 
 # Run system configuration script inside chroot
 curl -O https://raw.githubusercontent.com/daedrafruit/arch-test/main/system-config.bash
