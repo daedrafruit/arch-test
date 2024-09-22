@@ -1,6 +1,6 @@
 #!/usr/bin/env -S bash -e -x
 
-# Select the target disk for installation
+# curl -O https://raw.githubusercontent.com/daedrafruit/arch-test/main/arch.bash
 
 hostname="fruit"
 rootpass="password"
@@ -10,6 +10,7 @@ userpass="password"
 locale="en_US.UTF-8"
 kblayout="us"
 
+# Select the target disk for installation
 echo "Available disks for installation:"
 select ENTRY in $(lsblk -dpnoNAME | grep -P "/dev/sd|nvme|vd"); do
     DISK="$ENTRY"
@@ -71,6 +72,12 @@ echo "$hostname" > /mnt/etc/hostname
 echo "LANG=$locale" > /mnt/etc/locale.conf
 echo "$locale UTF-8" > /mnt/etc/locale.gen
 echo "KEYMAP=$kblayout" > /mnt/etc/vconsole.conf
+
+cat > /mnt/etc/hosts <<EOF
+127.0.0.1   localhost
+::1         localhost
+127.0.1.1   $hostname.localdomain   $hostname
+EOF
 
 # Configure the system
 arch-chroot /mnt /bin/bash -x -e <<EOF
