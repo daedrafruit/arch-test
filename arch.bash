@@ -1,7 +1,5 @@
 #!/usr/bin/env -S bash -e -x
 
-# curl -O https://raw.githubusercontent.com/daedrafruit/arch-test/main/arch.bash
-
 # Select the target disk for installation
 
 hostname="fruit"
@@ -30,23 +28,29 @@ fi
 wipefs -af "$DISK"
 sgdisk -Zo "$DISK"
 
-# Create partition scheme (EFI and root)
+# Create partition scheme (EFI, SWAP, and root)
 parted -s "$DISK" \
     mklabel gpt \
-    mkpart ESP fat32 1MiB 1025MiB \
+    mkpart ESP fat32 1MiB 1GiB \
     set 1 esp on \
-    mkpart ROOT ext4 1025MiB 100%
+    mkpart SWAP linux-swap 1GiB 5GiB \
+    mkpart ROOT ext4 5GiB 100%
 
 # Assign partitions to variables
 ESP="/dev/disk/by-partlabel/ESP"
+SWAP="/dev/disk/by-partlabel/SWAP"
 ROOT="/dev/disk/by-partlabel/ROOT"
 
 # Inform the Kernel of the partition changes
 partprobe "$DISK"
 
-# Format the partitions
+# Format the EFI and Root partitions
 mkfs.fat -F 32 "$ESP"
 mkfs.ext4 "$ROOT"
+
+# Setup the SWAP partition
+mkswap "$SWAP"
+swapon "$SWAP"
 
 # Mount the root and EFI partitions
 mount "$ROOT" /mnt
@@ -59,20 +63,16 @@ pacstrap /mnt base base-devel linux linux-firmware sudo networkmanager grub efib
 # Generate fstab
 genfstab -U /mnt >> /mnt/etc/fstab
 
-#enable networkmanager
+# Enable NetworkManager
 systemctl enable NetworkManager --root=/mnt
 
 # Set hostname, locale, and keyboard layout
 echo "$hostname" > /mnt/etc/hostname
-
-
 echo "LANG=$locale" > /mnt/etc/locale.conf
 echo "$locale UTF-8" > /mnt/etc/locale.gen
-
-
 echo "KEYMAP=$kblayout" > /mnt/etc/vconsole.conf
 
-# Configuring the system.
+# Configure the system
 arch-chroot /mnt /bin/bash -x -e <<EOF
 
     # Setting up timezone.
