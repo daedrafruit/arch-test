@@ -1,6 +1,6 @@
 #!/usr/bin/env -S bash -e -x
 
-source ./vars-config.bash
+source /mtn/root/vars-config.bash
 
 # Set root password
 echo "root:$rootpass" | chpasswd
