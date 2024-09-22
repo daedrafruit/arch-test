@@ -73,10 +73,6 @@ arch-chroot /mnt /bin/bash -e <<EOF
     # Generate locales
     locale-gen
 
-    # Set up GRUB bootloader
-    grub-install --target=x86_64-efi --efi-directory=/boot --bootloader-id=GRUB
-    grub-mkconfig -o /boot/grub/grub.cfg
-
     # Set root password
     echo "root:rootpassword" | chpasswd
 
