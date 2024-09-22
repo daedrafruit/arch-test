@@ -64,9 +64,6 @@ pacstrap /mnt base base-devel linux linux-firmware sudo networkmanager grub efib
 # Generate fstab
 genfstab -U /mnt >> /mnt/etc/fstab
 
-# Enable NetworkManager
-systemctl enable NetworkManager --root=/mnt
-
 # Set hostname, locale, and keyboard layout
 echo "$hostname" > /mnt/etc/hostname
 echo "LANG=$locale" > /mnt/etc/locale.conf
@@ -109,12 +106,24 @@ arch-chroot /mnt /bin/bash -x -e <<EOF
     grub-mkconfig -o /boot/grub/grub.cfg
 	
 	# Additional Packages
+	# !!! need sway-nvidia from aur
+	# !!! also confdir is not writable, see https://cdn.discordapp.com/attachments/687856603722022955/1287315484714336286/image.png?ex=66f11978&is=66efc7f8&hm=e58c481a9276ef3c0bc0a99801b44474144346bcba296552015802124453ac7a&
+	
 	pacman -S --noconfirm git stow firefox sway waybar ranger wofi kitty flameshot ly
 	
 	# Clone dotfiles
-	git clone https://github.com/daedrafruit/dotfiles.git /home/$username
+	cd /home/$username
+	git clone https://github.com/daedrafruit/dotfiles.git
+	chown -R $username:$username /home/$username/dotfiles
+	
 	cd /home/$username/dotfiles
-	stow sway waybar wofi kitty flameshot bashrc ranger
+	# !!! wont let me stow bashrc due to already existing
+	stow sway waybar wofi kitty flameshot ranger
+	# stow sway waybar wofi kitty flameshot bashrc ranger
+	
+	#enable services
+	systemctl enable ly.service
+	systemctl enable NetworkManager
 	
 	
 EOF
