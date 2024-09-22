@@ -99,7 +99,16 @@ arch-chroot /mnt /bin/bash -x -e <<EOF
 
     # Creating grub config file.
     grub-mkconfig -o /boot/grub/grub.cfg
-
+	
+	# Additional Packages
+	pacman -S --noconfirm git firefox sway waybar ranger wofi kitty flameshot ly
+	
+	# Clone dotfiles
+	git clone https://github.com/daedrafruit/dotfiles.git /home/$username
+	cd /home/$username/dotfiles
+	stow sway waybar wofi kitty flameshot bashrc ranger
+	
+	
 EOF
 
 # Set root password
