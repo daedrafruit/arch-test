@@ -70,7 +70,7 @@ kblayout="us"
 echo "KEYMAP=$kblayout" > /mnt/etc/vconsole.conf
 
 # Configuring the system.
-arch-chroot /mnt /bin/bash -e <<EOF
+arch-chroot /mnt /bin/bash -x -e <<EOF
 
     # Setting up timezone.
     ln -sf /usr/share/zoneinfo/US/Arizona /etc/localtime
