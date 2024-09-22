@@ -42,7 +42,6 @@ partprobe "$DISK"
 mkfs.fat -F 32 "$ESP"
 mkfs.ext4 "$ROOT"
 
-
 # Mount the root and EFI partitions
 mount "$ROOT" /mnt
 mkdir -p /mnt/boot
