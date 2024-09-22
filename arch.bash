@@ -73,7 +73,7 @@ echo "KEYMAP=$kblayout" > /mnt/etc/vconsole.conf
 arch-chroot /mnt /bin/bash -e <<EOF
 
     # Setting up timezone.
-    ln -sf /usr/share/zoneinfo/$(curl -s http://ip-api.com/line?fields=timezone) /etc/localtime &>/dev/null
+    ln -sf /usr/share/zoneinfo/US/Arizona /etc/localtime
 
     # Setting up clock.
     hwclock --systohc
@@ -99,9 +99,6 @@ echo "root:$rootpass" | arch-chroot /mnt chpasswd
 echo "%wheel ALL=(ALL:ALL) ALL" > /mnt/etc/sudoers.d/wheel
 arch-chroot /mnt useradd -m -G wheel -s /bin/bash "$username"
 echo "$username:$userpass" | arch-chroot /mnt chpasswd
-
-# Enable essential services
-arch-chroot /mnt systemctl enable NetworkManager
 
 # Finish up
 echo "Installation complete. You can now reboot."
