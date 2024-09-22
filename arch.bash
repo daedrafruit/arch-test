@@ -48,7 +48,7 @@ mkdir -p /mnt/boot
 mount "$ESP" /mnt/boot
 
 # Install the base system
-pacstrap /mnt base base-devel linux linux-headers linux-firmware sudo networkmanager
+pacstrap /mnt base base-devel linux linux-firmware sudo networkmanager grub
 
 # Generate fstab
 genfstab -U /mnt >> /mnt/etc/fstab
@@ -80,6 +80,13 @@ arch-chroot /mnt /bin/bash -e <<EOF
     useradd -m -G wheel -s /bin/bash username
     echo "username:userpassword" | chpasswd
     echo "%wheel ALL=(ALL) ALL" > /etc/sudoers.d/wheel
+	
+	
+    # Installing GRUB.
+    grub-install --target=x86_64-efi --efi-directory=/boot/ --bootloader-id=GRUB &>/dev/null
+
+    # Creating grub config file.
+    grub-mkconfig -o /boot/grub/grub.cfg &>/dev/null
 EOF
 
 
