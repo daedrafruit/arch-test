@@ -56,8 +56,10 @@ pacstrap /mnt base base-devel linux linux-firmware sudo networkmanager grub
 # Generate fstab
 genfstab -U /mnt >> /mnt/etc/fstab
 
-# Set hostname, locale, and keyboard layout
+#enable networkmanager
+systemctl enable NetworkManager --root=/mnt &>/dev/null
 
+# Set hostname, locale, and keyboard layout
 echo "$hostname" > /mnt/etc/hostname
 
 locale="en_US.UTF-8"
@@ -67,15 +69,28 @@ echo "$locale UTF-8" > /mnt/etc/locale.gen
 kblayout="us"
 echo "KEYMAP=$kblayout" > /mnt/etc/vconsole.conf
 
-# Set timezone to Arizona
-arch-chroot /mnt ln -sf /usr/share/zoneinfo/US/Arizona /etc/localtime
-arch-chroot /mnt hwclock --systohc
+# Configuring the system.
+arch-chroot /mnt /bin/bash -e <<EOF
 
-# Generate locales
-arch-chroot /mnt locale-gen
+    # Setting up timezone.
+    ln -sf /usr/share/zoneinfo/$(curl -s http://ip-api.com/line?fields=timezone) /etc/localtime &>/dev/null
 
-# Generating a new initramfs
-arch-chroot /mnt mkinitcpio -P &>/dev/null
+    # Setting up clock.
+    hwclock --systohc
+
+    # Generating locales.
+    locale-gen &>/dev/null
+
+    # Generating a new initramfs.
+    mkinitcpio -P &>/dev/null
+
+    # Installing GRUB.
+    grub-install --target=x86_64-efi --efi-directory=/boot/ --bootloader-id=GRUB &>/dev/null
+
+    # Creating grub config file.
+    grub-mkconfig -o /boot/grub/grub.cfg &>/dev/null
+
+EOF
 
 # Set root password
 echo "root:$rootpass" | arch-chroot /mnt chpasswd
@@ -84,12 +99,6 @@ echo "root:$rootpass" | arch-chroot /mnt chpasswd
 echo "%wheel ALL=(ALL:ALL) ALL" > /mnt/etc/sudoers.d/wheel
 arch-chroot /mnt useradd -m -G wheel -s /bin/bash "$username"
 echo "$username:$userpass" | arch-chroot /mnt chpasswd
-
-# Installing GRUB
-arch-chroot /mnt grub-install --target=x86_64-efi --efi-directory=/boot/ --bootloader-id=GRUB &>/dev/null
-
-# Creating grub config file
-arch-chroot /mnt grub-mkconfig -o /boot/grub/grub.cfg &>/dev/null
 
 # Enable essential services
 arch-chroot /mnt systemctl enable NetworkManager
