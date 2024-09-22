@@ -29,18 +29,18 @@ parted -s "$DISK" \
     mklabel gpt \
     mkpart ESP fat32 1MiB 1025MiB \
     set 1 esp on \
-    mkpart root ext4 1025MiB 100%
+    mkpart ROOT ext4 1025MiB 100%
 
 # Assign partitions to variables
 ESP="/dev/disk/by-partlabel/ESP"
-ROOT="/dev/disk/by-partlabel/root"
+ROOT="/dev/disk/by-partlabel/ROOT"
 
 # Inform the Kernel of the partition changes
 partprobe "$DISK"
 
 # Format the partitions
-mkfs.fat -F 32 "$ESP"
-mkfs.ext4 "$ROOT"
+mkfs.fat -F 32 "$ESP" &>/dev/null
+mkfs.ext4 "$ROOT" &>/dev/null
 
 # Mount the root and EFI partitions
 mount "$ROOT" /mnt
