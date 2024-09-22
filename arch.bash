@@ -34,8 +34,8 @@ parted -s "$DISK" \
     mklabel gpt \
     mkpart ESP fat32 1MiB 1GiB \
     set 1 esp on \
-    mkpart SWAP linux-swap 1GiB 9GiB \
-    mkpart ROOT ext4 9GiB 100%
+    mkpart SWAP linux-swap 1GiB 5GiB \
+    mkpart ROOT ext4 5GiB 100%
 
 # Assign partitions to variables
 ESP="/dev/disk/by-partlabel/ESP"
