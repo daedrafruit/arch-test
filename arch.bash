@@ -5,13 +5,7 @@
 # chmod +x arch.bash
 # ./arch.bash
 
-hostname="fruit"
-rootpass="password"
-username="daedr"
-userpass="password"
-
-locale="en_US.UTF-8"
-kblayout="us"
+source ./vars-config.bash
 
 # Select the target disk for installation
 echo "Available disks for installation:"
@@ -79,64 +73,11 @@ cat > /mnt/etc/hosts <<EOF
 127.0.1.1   $hostname.localdomain   $hostname
 EOF
 
-# Configure the system
-arch-chroot /mnt /bin/bash -x -e <<EOF
+# Run system configuration script inside chroot
+arch-chroot /mnt /bin/bash -x /root/system-config.bash
 
-    # Set root password
-    echo "root:$rootpass" | chpasswd
+# Run user configuration script inside chroot as the specified user
+arch-chroot /mnt /usr/bin/runuser -u $username -c /root/user-config.bash
 
-    # Add user and set password
-    useradd -m -G wheel -s /bin/bash "$username"
-    echo "$username:$userpass" | chpasswd
-	
-	# Setting up timezone.
-	ln -sf /usr/share/zoneinfo/US/Arizona /etc/localtime
-
-	# Setting up clock.
-	hwclock --systohc
-
-	# Generating locales.
-	locale-gen
-
-	# Generating a new initramfs.
-	mkinitcpio -P
-
-	# Installing GRUB.
-	grub-install --target=x86_64-efi --efi-directory=/boot --bootloader-id=GRUB
-
-	# Creating grub config file.
-	grub-mkconfig -o /boot/grub/grub.cfg
-
-	# Additional Packages
-	# consider nvidia mesa amd-ucode
-	pacman -S --noconfirm --needed git base-devel stow firefox waybar ranger wofi kitty flameshot ly
-
-	#enable services
-	systemctl enable NetworkManager systemd-timesyncd ly
-	
-EOF
-
-# Configure as user
-arch-chroot /mnt /usr/bin/runuser -u $username -c '
-	cd /home/$username
-
-	# install yay
-	git clone https://aur.archlinux.org/yay.git
-	cd yay
-	makepkg -si --noconfirm
-	cd /home/$username
-
-	# Install packages using yay
-	yay -S --noconfirm swayfx sway-nvidia
-			
-	# Clone dotfiles
-	git clone https://github.com/daedrafruit/dotfiles.git
-	# remove existing bashrc
-	rm /home/$username/.bashrc
-	# stow dotfiles
-	cd /home/$username/dotfiles
-	stow sway waybar wofi kitty flameshot bashrc ranger
-'
-	
 # Finish up
 echo "Installation complete. You can now reboot."
