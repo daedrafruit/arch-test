@@ -2,10 +2,13 @@
 
 # curl -O https://raw.githubusercontent.com/daedrafruit/arch-test/main/arch.bash
 
-# Clear the terminal
-clear
-
 # Select the target disk for installation
+
+hostname="fruit"
+rootpass="password"
+username="daedr"
+userpass="password"
+
 echo "Available disks for installation:"
 select ENTRY in $(lsblk -dpnoNAME | grep -P "/dev/sd|nvme|vd"); do
     DISK="$ENTRY"
@@ -54,7 +57,7 @@ pacstrap /mnt base base-devel linux linux-firmware sudo networkmanager grub
 genfstab -U /mnt >> /mnt/etc/fstab
 
 # Set hostname, locale, and keyboard layout
-hostname="fruit"
+
 echo "$hostname" > /mnt/etc/hostname
 
 locale="en_US.UTF-8"
@@ -64,31 +67,29 @@ echo "$locale UTF-8" > /mnt/etc/locale.gen
 kblayout="us"
 echo "KEYMAP=$kblayout" > /mnt/etc/vconsole.conf
 
-# Enter the chroot environment for configuration
-arch-chroot /mnt /bin/bash -e <<EOF
-    # Set timezone to Arizona
-    ln -sf /usr/share/zoneinfo/US/Arizona /etc/localtime
-    hwclock --systohc
+# Set timezone to Arizona
+arch-chroot /mnt ln -sf /usr/share/zoneinfo/US/Arizona /etc/localtime
+arch-chroot /mnt hwclock --systohc
 
-    # Generate locales
-    locale-gen
+# Generate locales
+arch-chroot /mnt locale-gen
 
-    # Set root password
-    echo "root:rootpassword" | chpasswd
+# Generating a new initramfs
+arch-chroot /mnt mkinitcpio -P &>/dev/null
 
-    # Add a user with sudo privileges
-    useradd -m -G wheel -s /bin/bash username
-    echo "username:userpassword" | chpasswd
-    echo "%wheel ALL=(ALL) ALL" > /etc/sudoers.d/wheel
-	
-	
-    # Installing GRUB.
-    grub-install --target=x86_64-efi --efi-directory=/boot/ --bootloader-id=GRUB &>/dev/null
+# Set root password
+echo "root:$rootpass" | arch-chroot /mnt chpasswd
 
-    # Creating grub config file.
-    grub-mkconfig -o /boot/grub/grub.cfg &>/dev/null
-EOF
+# Add a user with sudo privileges
+echo "%wheel ALL=(ALL:ALL) ALL" > /mnt/etc/sudoers.d/wheel
+arch-chroot /mnt useradd -m -G wheel -s /bin/bash "$username"
+echo "$username:$userpass" | arch-chroot /mnt chpasswd
 
+# Installing GRUB
+arch-chroot /mnt grub-install --target=x86_64-efi --efi-directory=/boot/ --bootloader-id=GRUB &>/dev/null
+
+# Creating grub config file
+arch-chroot /mnt grub-mkconfig -o /boot/grub/grub.cfg &>/dev/null
 
 # Enable essential services
 arch-chroot /mnt systemctl enable NetworkManager
