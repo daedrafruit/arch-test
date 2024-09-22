@@ -34,7 +34,7 @@ parted -s "$DISK" \
     mklabel gpt \
     mkpart ESP fat32 1MiB 1GiB \
     set 1 esp on \
-    mkpart SWAP linux-swap 1GiB 5GiB \
+    mkpart SWAP linux-swap 1GiB 9GiB \
     mkpart ROOT ext4 5GiB 100%
 
 # Assign partitions to variables
@@ -106,25 +106,33 @@ arch-chroot /mnt /bin/bash -x -e <<EOF
     grub-mkconfig -o /boot/grub/grub.cfg
 	
 	# Additional Packages
-	# !!! need sway-nvidia from aur
-	# !!! also confdir is not writable, see https://cdn.discordapp.com/attachments/687856603722022955/1287315484714336286/image.png?ex=66f11978&is=66efc7f8&hm=e58c481a9276ef3c0bc0a99801b44474144346bcba296552015802124453ac7a&
-	
-	pacman -S --noconfirm git stow firefox sway waybar ranger wofi kitty flameshot ly
-	
-	# Clone dotfiles
-	cd /home/$username
-	git clone https://github.com/daedrafruit/dotfiles.git
-	chown -R $username:$username /home/$username/dotfiles
-	
-	cd /home/$username/dotfiles
-	# !!! wont let me stow bashrc due to already existing
-	stow sway waybar wofi kitty flameshot ranger
-	# stow sway waybar wofi kitty flameshot bashrc ranger
+	pacman -S --noconfirm --needed git stow firefox sway waybar ranger wofi kitty flameshot ly
 	
 	#enable services
 	systemctl enable ly.service
 	systemctl enable NetworkManager
 	
+	# Configure as user
+	cd /home/$username
+	sudo -u $username bash <<'EOC'
+        cd /home/$username
+		
+		# install yay
+        git clone https://aur.archlinux.org/yay.git
+        cd yay
+        makepkg -si --noconfirm
+
+        # Install packages using yay
+        yay -S --noconfirm swayfx sway-nvidia
+				
+		# Clone dotfiles
+		git clone https://github.com/daedrafruit/dotfiles.git
+		# remove existing bashrc
+		rm /home/$username/.bashrc
+		# stow dotfiles
+		cd /home/$username/dotfiles
+		stow sway waybar wofi kitty flameshot bashrc ranger
+    EOC
 	
 EOF
 
