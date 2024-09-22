@@ -5,6 +5,16 @@
 # chmod +x arch.bash
 # ./arch.bash
 
+
+curl -O https://raw.githubusercontent.com/daedrafruit/arch-test/main/vars-config.bash
+chmod +x vars-config.bash
+
+curl -O https://raw.githubusercontent.com/daedrafruit/arch-test/main/system-config.bash
+chmod +x system-config.bash
+
+curl -O https://raw.githubusercontent.com/daedrafruit/arch-test/main/user-config.bash
+chmod +x user-config.bash
+
 source ./vars-config.bash
 
 # Select the target disk for installation
