@@ -58,7 +58,7 @@ mkdir -p /mnt/boot
 mount "$ESP" /mnt/boot
 
 # Install the base system
-pacstrap /mnt base base-devel linux linux-firmware sudo networkmanager grub efibootmgr
+pacstrap /mnt $pacstrap_pkgs
 
 # Generate fstab
 genfstab -U /mnt >> /mnt/etc/fstab

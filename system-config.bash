@@ -29,8 +29,8 @@ grub-mkconfig -o /boot/grub/grub.cfg
 
 # Additional Packages
 # consider nvidia mesa amd-ucode
-pacman -S --noconfirm --needed git base-devel stow firefox waybar ranger wofi kitty flameshot ly
+pacman -S --noconfirm --needed $pacman_pkgs
 
 #enable services
-systemctl enable NetworkManager systemd-timesyncd ly
+systemctl enable $services
 	
