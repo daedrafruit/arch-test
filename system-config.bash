@@ -37,4 +37,8 @@ systemctl enable $services
 # download background
 mkdir -p /usr/share/backgrounds/tiling
 curl -o /usr/share/backgrounds/tiling/tiling-cats.png https://cdn.osxdaily.com/wp-content/uploads/2017/12/classic-mac-os-tile-wallpapers-4.png
+
+curl -O https://raw.githubusercontent.com/daedrafruit/arch-test/main/fonts-install.bash
+chmod +x fonts-install.bash
+./fonts-install.bash
 	

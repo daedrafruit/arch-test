@@ -1,11 +1,5 @@
 #!/usr/bin/env bash
 
-# Ensure the script is run as root for system-wide installation
-if [ "$EUID" -ne 0 ]; then
-    echo "Please run as root"
-    exit
-fi
-
 # Create the system-wide fonts directory and a temporary directory for download
 mkdir -p /usr/share/fonts/custom
 mkdir -p /tmp/fonts-download
