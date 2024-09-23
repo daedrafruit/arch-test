@@ -7,8 +7,9 @@
 
 curl -O https://raw.githubusercontent.com/daedrafruit/arch-test/main/vars-config.bash
 chmod +x vars-config.bash
+mv vars-config.bash /mnt/scripts
 
-source ./vars-config.bash
+source /mnt/scripts/vars-config.bash
 
 # Select the target disk for installation
 echo "Available disks for installation:"
@@ -76,18 +77,17 @@ cat > /mnt/etc/hosts <<EOF
 127.0.1.1   $hostname.localdomain   $hostname
 EOF
 
-mv vars-config.bash /mnt/scripts/vars-config.bash
 
 # Run system configuration script inside chroot
 curl -O https://raw.githubusercontent.com/daedrafruit/arch-test/main/system-config.bash
 chmod +x system-config.bash
-mv system-config.bash /mnt/scripts/system-config.bash
+mv system-config.bash /mnt/scripts
 arch-chroot /mnt /bin/bash -x /mnt/scripts/system-config.bash
 
 # Run user configuration script inside chroot as the specified user
 curl -O https://raw.githubusercontent.com/daedrafruit/arch-test/main/user-config.bash
 chmod +x user-config.bash
-mv user-config.bash /mnt/scripts/user-config.bash
+mv user-config.bash /mnt/scripts
 arch-chroot /mnt /usr/bin/runuser -u $username -c /mnt/scripts/user-config.bash
 
 # Finish up
