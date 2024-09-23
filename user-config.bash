@@ -1,6 +1,6 @@
 #!/usr/bin/env -S bash -e -x
 
-source /mnt/root/vars-config.bash
+source /mnt/scripts/vars-config.bash
 
 # Configure as user
 

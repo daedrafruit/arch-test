@@ -76,19 +76,19 @@ cat > /mnt/etc/hosts <<EOF
 127.0.1.1   $hostname.localdomain   $hostname
 EOF
 
-cp vars-config.bash /mnt/root/vars-config.bash
+mv vars-config.bash /mnt/scripts/vars-config.bash
 
 # Run system configuration script inside chroot
 curl -O https://raw.githubusercontent.com/daedrafruit/arch-test/main/system-config.bash
 chmod +x system-config.bash
-cp system-config.bash /mnt/root/system-config.bash
-arch-chroot /mnt /bin/bash -x /root/system-config.bash
+mv system-config.bash /mnt/scripts/system-config.bash
+arch-chroot /mnt /bin/bash -x /mnt/scripts/system-config.bash
 
 # Run user configuration script inside chroot as the specified user
 curl -O https://raw.githubusercontent.com/daedrafruit/arch-test/main/user-config.bash
 chmod +x user-config.bash
-cp user-config.bash /mnt/root/user-config.bash
-arch-chroot /mnt /usr/bin/runuser -u $username -c /root/user-config.bash
+mv user-config.bash /mnt/scripts/user-config.bash
+arch-chroot /mnt /usr/bin/runuser -u $username -c /mnt/scripts/user-config.bash
 
 # Finish up
 echo "Installation complete. You can now reboot."
