@@ -3,11 +3,11 @@
 source /mnt/scripts/vars-config.bash
 
 # Set root password
-echo "root:$rootpass" | chpasswd
+#echo "root:$rootpass" | chpasswd
 
 # Add user and set password
-useradd -m -G wheel -s /bin/bash "$username"
-echo "$username:$userpass" | chpasswd
+#useradd -m -G wheel -s /bin/bash "$username"
+#echo "$username:$userpass" | chpasswd
 
 # Setting up timezone.
 ln -sf /usr/share/zoneinfo/$timezone /etc/localtime

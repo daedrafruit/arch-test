@@ -75,6 +75,13 @@ cat > /mnt/etc/hosts <<EOF
 127.0.1.1   $hostname.localdomain   $hostname
 EOF
 
+# Setting root password.
+echo "root:$rootpass" | arch-chroot /mnt chpasswd
+
+echo "%wheel ALL=(ALL:ALL) ALL" > /mnt/etc/sudoers.d/wheel
+arch-chroot /mnt useradd -m -G wheel -s /bin/bash "$username"
+echo "$username:$userpass" | arch-chroot /mnt chpasswd
+
 mkdir /mnt/scripts
 cp vars-config.bash /mnt/scripts
 
@@ -86,10 +93,10 @@ cp user-config.bash /mnt/scripts
 chmod -R 755 /mnt/scripts
 
 # Run system configuration script inside chroot
-arch-chroot /mnt /bin/bash -x /mnt/scripts/system-config.bash
+arch-chroot /mnt /bin/bash -x /scripts/system-config.bash
 
 # Run user configuration script inside chroot as the specified user
-arch-chroot /mnt /usr/bin/runuser -u $username -c /mnt/scripts/user-config.bash
+arch-chroot /mnt /usr/bin/runuser -u $username /scripts/user-config.bash
 
 # Finish up
 echo "Installation complete. You can now reboot."
