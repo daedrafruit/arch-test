@@ -3,11 +3,11 @@
 source /scripts/vars-config.bash
 
 # Set root password
-#echo "root:$rootpass" | chpasswd
+echo "root:$rootpass" | chpasswd
 
 # Add user and set password
-#useradd -m -G wheel -s /bin/bash "$username"
-#echo "$username:$userpass" | chpasswd
+useradd -m -G wheel -s /bin/bash "$username"
+echo "$username:$userpass" | chpasswd
 
 # Setting up timezone.
 ln -sf /usr/share/zoneinfo/$timezone /etc/localtime
@@ -33,4 +33,8 @@ pacman -S --noconfirm --needed $pacman_pkgs
 
 #enable services
 systemctl enable $services
+
+# download background
+mkdir -p /usr/share/backgrounds/tiling
+curl -o /usr/share/backgrounds/tiling/tiling-cats.png https://cdn.osxdaily.com/wp-content/uploads/2017/12/classic-mac-os-tile-wallpapers-4.png
 	

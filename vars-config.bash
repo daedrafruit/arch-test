@@ -15,7 +15,7 @@ kblayout="us"
 timezone="US/Arizona"
 
 pacstrap_pkgs="base base-devel linux linux-firmware sudo networkmanager grub efibootmgr"
-pacman_pkgs="git base-devel stow firefox waybar ranger wofi kitty flameshot ly"
+pacman_pkgs="unzip git base-devel stow firefox waybar ranger wofi swaybg kitty flameshot ly"
 aur_pkgs="swayfx"
 
 stow_args="sway waybar wofi kitty flameshot bashrc ranger"
