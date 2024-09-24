@@ -15,7 +15,9 @@ kblayout="us"
 timezone="US/Arizona"
 
 pacstrap_pkgs="virtualbox-guest-utils base base-devel linux linux-firmware sudo networkmanager grub efibootmgr"
-pacman_pkgs="foot unzip git base-devel stow firefox waybar ranger wofi swaybg kitty flameshot ly ttf-font-awesome"
+pacman_pkgs="foot unzip git base-devel stow firefox waybar ranger wofi swaybg kitty ly ttf-font-awesome"
+flameshot_pkgs="flameshot xdg-desktop-portal xdg-desktop-portal-wlr wl-clipboard grim"
+
 aur_pkgs="swayfx"
 
 stow_args="sway waybar wofi kitty flameshot bashrc ranger"
